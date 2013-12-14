@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Mybatis.QABoardMapper">
+	<insert id="QABoardInsert" parameterType="QABoardVo">
+		insert into
+		qaboard(qaboanum,qaboatitle,qaboacontent,qaboahit,qaboadate,usernum,username,userpwd)
+		values(qaboa_seq.nextval,#{QAboaTitle},#{QAboaContent},0,sysdate,#{userNum},#{userName},#{userPwd})
+	</insert>
+	<insert id="QACommentInsert" parameterType="QAReplyVo">
+	insert into reply(repnum,qaboanum,repcontent,usernum,username) values(rep_seq.nextval,#{QABoaNum},#{RepContent},#{UserNum},#{UserName})
+	</insert>
+	<select id="QAcommentlist" resultType="QAReplyVo" parameterType="int">
+		select * from reply where qaboanum=#{qr} order by RepNum desc 
+	</select>
+		<select id="QAlist" resultType="QABoardVo">
+		select qaboanum,qaboatitle,qaboacontent,qaboahit,qaboadate,username from
+		qaboard order by qaboadate desc
+	</select>
+	<select id="QABoarddetail" resultType="QABoardVo" parameterType="int">
+		select * from qaboard where qaboanum=#{qaboanum}
+	</select>
+	<select id="QApagelist" resultType="QABoardVo" parameterType="map">
+	select * from(select rownum rnum, qaboanum,qaboatitle,qaboacontent,qaboahit,qaboadate,usernum,username,userpwd from
+	(select * from qaboard order by QAboaDate desc))
+	where rnum between #{start} and #{end}
+	</select>
+	<select id="QAcountNo()" resultType="int">
+	select count(*) from qaboard
+	</select>
+	
+	<delete id="QABoarddelete" parameterType="int">
+		delete from qaboard where qaboanum=#{qaboanum}
+	</delete>
+	<delete id="QACommentDel" parameterType="int">
+	delete from reply where repnum=#{RepNum}
+	
+	</delete>
+	<update id="QABoardupdate" parameterType="QABoardVo">
+		update qaboard set qaboatitle=#{QAboaTitle}, qaboacontent=#{QAboaContent},
+		qaboadate=sysdate, qaboahit=0 where qaboanum=#{QAboaNum}
+	</update>
+	<select id="getQARecentList" resultType="QABoardVo">
+		select qaboanum, qaboatitle, qaboacontent, qaboadate, qaboahit, usernum,
+		username, userpwd from (select rownum, qaboanum, qaboatitle,
+		qaboacontent, qaboadate, qaboahit, usernum, username, userpwd from
+		qaboard order by qaboadate desc) where rownum between 1 and 3
+	</select>
+	<select id="search" parameterType="String" resultType="QABoardVo">
+		select qaboanum, qaboatitle, qaboacontent, qaboadate, qaboahit, usernum,
+		username, userpwd from qaboard where qaboatitle like #{sch} or
+		qaboacontent like #{sch}
+	</select>
+	<update id="qaboahit" parameterType="int">
+	update qaboard set qaboahit = (qaboahit+1) where qaboanum = #{QAboaNum}
+	</update>
+
+</mapper>

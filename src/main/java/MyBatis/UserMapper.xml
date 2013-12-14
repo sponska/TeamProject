@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Mybatis.UserMapper">
+
+
+	<select id="getInfo" parameterType="int" resultType="UserVo">
+		select * from account a, info i where a.usernum = #{userNum} and i.usernum = #{userNum}
+	</select>
+	<select id="getUser" parameterType="UserVo" resultType="UserVo">
+		select a.usernum,a.userout,i.admin from account a,info i where a.usernum=i.usernum and (a.userid=#{userId} and a.userpwd=#{userPwd})
+	</select>
+	<select id="getUserList" resultType="UserVo">
+		select * from account a, info i where a.usernum = i.usernum order by a.usernum
+	</select>
+	<select id="getUserId" parameterType="String" resultType="String">
+		select userid from account where userid=#{userId}
+	</select>
+	
+	<insert id="registerAccount" parameterType="UserVo">
+		insert into account(usernum,userid,userpwd,regdate,userout) values(#{userNum},#{userId},#{userPwd},sysdate,'n')
+	</insert>
+	<insert id="registerInfo" parameterType="UserVo">
+		insert into info(usernum,username,usertel,useraddr,useremail,admin) values(#{userNum},#{userName},#{userTel},#{userAddr},#{userEmail},'n')
+	</insert>
+	<select id="getUserNumMax" resultType="int">
+		select max(usernum) from account
+	</select>
+	<update id="delUser" parameterType="int">
+		update account set userout='y' where usernum=#{userNum}
+	</update>
+	<update id="updateUser" parameterType="UserVo">
+		update info set userName=#{userName}, userEmail=#{userEmail}, userTel=#{userTel}, userAddr=#{userAddr}, admin=#{admin} where usernum=#{userNum}
+	</update>
+	<update id="updateUserAdmin" parameterType="UserVo">
+		update account set userid=#{userId}, userpwd=#{userPwd}, userout=#{userOut} where usernum=#{userNum}
+	</update>
+	<select id="getFind" parameterType="UserVo" resultType="UserVo">
+		select a.userid,a.userpwd from account a, info i where a.usernum = i.usernum and i.username = #{userName} and i.useremail = #{userEmail}
+	</select>
+</mapper>

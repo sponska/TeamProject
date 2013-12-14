@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Mybatis.BoardMapper">
+
+	<select id="getBoardList" resultType="BoardVo">
+	select * from board order by boadate desc
+	</select>
+	
+	<insert id="boardinsert" parameterType="BoardVo">
+		insert into board(boanum,boatitle, boacontent, boadate,boahit) values(boa_seq.nextval,#{boatitle},#{boacontent},sysdate,0)
+	</insert>
+	
+	<select id="getBoaNumMax" resultType="int">
+		select max(boanum) from board
+	</select>
+	
+	<select id="getboardseq" parameterType="int" resultType="BoardVo">
+		select * from board where boanum = #{boaNum}
+	</select>
+	
+	<update id="boardUp" parameterType="BoardVo">
+		update board set boatitle=#{boatitle}, boacontent=#{boacontent} where boanum=#{boanum}
+	</update>
+	
+	<delete id="boadel" parameterType="int">
+		delete from board where boanum=#{boanum}
+	</delete>
+	
+	<update id="boahit" parameterType="int">
+		update board set boahit = (boahit+1) where boanum = #{boanum}
+	</update>
+	
+	<select id="getRows" resultType="int">
+	select count(*) from board
+	</select>
+	<select id="getRecentList" resultType="BoardVo">
+	select boanum, boatitle, boacontent, boadate, boahit from (select rownum, boanum, boatitle, boacontent, boadate, boahit from board order by boadate desc) where rownum between 1 and 3
+	</select>
+	
+	<select id="getArticleList" parameterType="map" resultType="BoardVo">
+	select * from (select rownum rnum, boanum, boatitle, boaContent, boadate, boahit from 
+	(select * from board order by boadate desc))
+	where rnum between #{start} and #{end}
+	</select>
+	
+	<select id="searchboa" parameterType="String" resultType="BoardVo">
+	select * from (select boanum, boatitle, boacontent, boadate, boahit from 
+	(select * from board order by boadate desc))
+	 board where boatitle like #{sch} or boacontent like #{sch}
+	</select>
+	
+	<select id="getprevtitle" parameterType="int" resultType="BoardVo">
+	SELECT * FROM BOARD WHERE BOANUM &lt; #{boanum} AND ROWNUM = 1 ORDER BY BOANUM DESC
+	</select>
+	<select id="getnexttitle" parameterType="int" resultType="BoardVo">
+	SELECT * FROM BOARD WHERE BOANUM &gt; #{boanum} AND ROWNUM = 1 ORDER BY BOANUM DESC 
+	</select>
+</mapper>
